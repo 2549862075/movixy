@@ -261,7 +261,6 @@ const PasswordRules = {
 const vClickOutside = {
   mounted (el, binding) {
     function eventHandler (e) {
-      console.log(e.target)
       if (el.contains(e.target)) {
         return false
       }

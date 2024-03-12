@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { ref, computed,defineEmits } from 'vue';
+import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { ContextMenu, ContextMenuItem } from '@imengyu/vue3-context-menu';

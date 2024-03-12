@@ -6,3 +6,10 @@ export function getDanmuListByVideoId(params) {
 		params:params
 	})
 }
+export function addDanmu(params) {
+	return request({
+		url: '/danmu/addDanmu',
+		method: 'post',
+		data:params
+	})
+}

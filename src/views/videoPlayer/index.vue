@@ -3,20 +3,25 @@
     <div class="video-player__left">
       <div class="video-player__left-top">
         <div class="player-container">
-          <div class="video1" v-if="whichCore && videoIsReady&&videoDanmuIsReady">
-            <vue3-video-player :title="videoData.video_name" @play="videoPlay" autoplay
+          <div class="video1" v-if="whichCore && videoIsReady && videoDanmuIsReady">
+            <vue3-video-player :title="videoData.video_name" @play="videoPlay" :autoplay="true"
               :view-core="viewCore.bind(null, 'video')" :src="currentVideoSrc"
-              :barrageConfig="{ fontSize: 20, opacity: 90, position: 80, barrageList: barragesJson }"></vue3-video-player>
+              :barrageConfig="{ fontSize: 20, opacity: 90, position: 70, barrageList: barragesJson }">
+            </vue3-video-player>
           </div>
-          <div class="video2" v-if="!whichCore && videoIsReady&&videoDanmuIsReady">
-            <vue3-video-player class="video2-player" :core="HLSCore" @play="videoPlay" autoplay
+          <div class="video2" v-if="!whichCore && videoIsReady && videoDanmuIsReady">
+            <vue3-video-player class="video2-player" :core="HLSCore" @play="videoPlay" :autoplay="true"
               :view-core="viewCore.bind(null, 'video')" :src="currentVideoSrc"
-              :barrageConfig="{ fontSize: 20, opacity: 90, position: 80, barrageList: barragesJson }">
+              :barrageConfig="{ fontSize: 20, opacity: 90, position: 70, barrageList: barragesJson }">
             </vue3-video-player>
           </div>
         </div>
       </div>
       <div class="video-player__left-bottom">
+        <div style="display: flex;flex-direction: row;justify-content: flex-end;width: 90%;margin-top: 20px;">
+          <Danmu v-if="playerIsReady" @updateDanmu="getDanmuList" style="height: 43px;" :video_id="videoData.video_id"
+            :videoplayer="playerOnDanmu"></Danmu>
+        </div>
         <div class="video-player-content">
           <el-row justify="space-between" class="video-player-content-top">
             <el-col :span="6">
@@ -26,38 +31,44 @@
             <el-col :span="12">
               <el-row align="middle" :gutter="20" style="height: 100%">
                 <el-col style="" :span="8">
-                  <div class="btn_selections">
-                    <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M10 14C12.2091 14 14 12.2091 14 10C14 7.79086 12.2091 6 10 6C7.79086 6 6 7.79086 6 10C6 12.2091 7.79086 14 10 14Z"
-                        fill="var(--color-white)" />
-                      <path
-                        d="M24 14C26.2091 14 28 12.2091 28 10C28 7.79086 26.2091 6 24 6C21.7909 6 20 7.79086 20 10C20 12.2091 21.7909 14 24 14Z"
-                        fill="var(--color-white)" />
-                      <path
-                        d="M38 14C40.2091 14 42 12.2091 42 10C42 7.79086 40.2091 6 38 6C35.7909 6 34 7.79086 34 10C34 12.2091 35.7909 14 38 14Z"
-                        fill="var(--color-white)" />
-                      <path
-                        d="M10 28C12.2091 28 14 26.2091 14 24C14 21.7909 12.2091 20 10 20C7.79086 20 6 21.7909 6 24C6 26.2091 7.79086 28 10 28Z"
-                        fill="var(--color-white)" />
-                      <path
-                        d="M24 28C26.2091 28 28 26.2091 28 24C28 21.7909 26.2091 20 24 20C21.7909 20 20 21.7909 20 24C20 26.2091 21.7909 28 24 28Z"
-                        fill="var(--color-white)" />
-                      <path
-                        d="M38 28C40.2091 28 42 26.2091 42 24C42 21.7909 40.2091 20 38 20C35.7909 20 34 21.7909 34 24C34 26.2091 35.7909 28 38 28Z"
-                        fill="var(--color-white)" />
-                      <path
-                        d="M10 42C12.2091 42 14 40.2091 14 38C14 35.7909 12.2091 34 10 34C7.79086 34 6 35.7909 6 38C6 40.2091 7.79086 42 10 42Z"
-                        fill="var(--color-white)" />
-                      <path
-                        d="M24 42C26.2091 42 28 40.2091 28 38C28 35.7909 26.2091 34 24 34C21.7909 34 20 35.7909 20 38C20 40.2091 21.7909 42 24 42Z"
-                        fill="var(--color-white)" />
-                      <path
-                        d="M38 42C40.2091 42 42 40.2091 42 38C42 35.7909 40.2091 34 38 34C35.7909 34 34 35.7909 34 38C34 40.2091 35.7909 42 38 42Z"
-                        fill="var(--color-white)" />
-                    </svg>
-                    <span>&nbsp; Selections</span>
-                  </div>
+                  <el-popover placement="top" :width="200" :show-arrow="false" transition="el-zoom-in-top"
+                    trigger="click" popper-style="background-color:rgba(0, 0, 0, 0.4);border:none;fliter:blur(1px);">
+                    <template #reference>
+                      <div class="btn_selections">
+                        <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M10 14C12.2091 14 14 12.2091 14 10C14 7.79086 12.2091 6 10 6C7.79086 6 6 7.79086 6 10C6 12.2091 7.79086 14 10 14Z"
+                            fill="var(--color-white)" />
+                          <path
+                            d="M24 14C26.2091 14 28 12.2091 28 10C28 7.79086 26.2091 6 24 6C21.7909 6 20 7.79086 20 10C20 12.2091 21.7909 14 24 14Z"
+                            fill="var(--color-white)" />
+                          <path
+                            d="M38 14C40.2091 14 42 12.2091 42 10C42 7.79086 40.2091 6 38 6C35.7909 6 34 7.79086 34 10C34 12.2091 35.7909 14 38 14Z"
+                            fill="var(--color-white)" />
+                          <path
+                            d="M10 28C12.2091 28 14 26.2091 14 24C14 21.7909 12.2091 20 10 20C7.79086 20 6 21.7909 6 24C6 26.2091 7.79086 28 10 28Z"
+                            fill="var(--color-white)" />
+                          <path
+                            d="M24 28C26.2091 28 28 26.2091 28 24C28 21.7909 26.2091 20 24 20C21.7909 20 20 21.7909 20 24C20 26.2091 21.7909 28 24 28Z"
+                            fill="var(--color-white)" />
+                          <path
+                            d="M38 28C40.2091 28 42 26.2091 42 24C42 21.7909 40.2091 20 38 20C35.7909 20 34 21.7909 34 24C34 26.2091 35.7909 28 38 28Z"
+                            fill="var(--color-white)" />
+                          <path
+                            d="M10 42C12.2091 42 14 40.2091 14 38C14 35.7909 12.2091 34 10 34C7.79086 34 6 35.7909 6 38C6 40.2091 7.79086 42 10 42Z"
+                            fill="var(--color-white)" />
+                          <path
+                            d="M24 42C26.2091 42 28 40.2091 28 38C28 35.7909 26.2091 34 24 34C21.7909 34 20 35.7909 20 38C20 40.2091 21.7909 42 24 42Z"
+                            fill="var(--color-white)" />
+                          <path
+                            d="M38 42C40.2091 42 42 40.2091 42 38C42 35.7909 40.2091 34 38 34C35.7909 34 34 35.7909 34 38C34 40.2091 35.7909 42 38 42Z"
+                            fill="var(--color-white)" />
+                        </svg>
+                        <span>&nbsp; Selections</span>
+                      </div>
+                    </template>
+                    
+                  </el-popover>
                 </el-col>
                 <el-col style="" :span="8">
                   <div class="btn_download">
@@ -69,16 +80,16 @@
                   </div>
                 </el-col>
                 <el-col :span="6">
-                  <div class="btn_like" @click="handlebtnLike">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <div class="btn_favorite" @click="handlebtnFavorite">
+                    <!-- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path
                         d="M8.39014 18.49V8.32998C8.39014 7.92998 8.51014 7.53998 8.73014 7.20998L11.4601 3.14998C11.8901 2.49998 12.9601 2.03998 13.8701 2.37998C14.8501 2.70998 15.5001 3.80997 15.2901 4.78997L14.7701 8.05998C14.7301 8.35998 14.8101 8.62998 14.9801 8.83998C15.1501 9.02998 15.4001 9.14997 15.6701 9.14997H19.7801C20.5701 9.14997 21.2501 9.46997 21.6501 10.03C22.0301 10.57 22.1001 11.27 21.8501 11.98L19.3901 19.47C19.0801 20.71 17.7301 21.72 16.3901 21.72H12.4901C11.8201 21.72 10.8801 21.49 10.4501 21.06L9.17014 20.07C8.68014 19.7 8.39014 19.11 8.39014 18.49Z"
                         fill="var(--color-white)" />
                       <path
                         d="M5.21 6.38H4.18C2.63 6.38 2 6.98 2 8.46V18.52C2 20 2.63 20.6 4.18 20.6H5.21C6.76 20.6 7.39 20 7.39 18.52V8.46C7.39 6.98 6.76 6.38 5.21 6.38Z"
                         fill="var(--color-white)" />
-                    </svg>
-                    <span>&nbsp;Like</span>
+                    </svg> -->
+                    <span>&nbsp;Favorite</span>
                   </div>
                 </el-col>
                 <!-- <el-col :span="8"></el-col> -->
@@ -96,7 +107,7 @@
               Brief Introduction
             </div>
             <div class="video-player-content-bottom-description">
-              fvfrvfrvrf rvcfrvfrv
+              {{ videoData.summary }}
             </div>
           </div>
         </div>
@@ -175,14 +186,17 @@ import { ref, onMounted, watch } from "vue";
 import { getVideoById } from "#/api/videoApi";
 import { getDanmuListByVideoId } from "#/api/danmuApi";
 import WideCard from "#/components/WideCard/index.vue";
+import Danmu from "#/components/Danmu/index.vue";
 import HLSCore from "@cloudgeek/playcore-hls";
 import { useRouter } from "vue-router";
 const whichCore = ref(false); //false表示video2，也就是支持HLS的核心。true也就是video1
 const players = ref({});
+const playerOnDanmu = ref('');
 const router = useRouter();
 const videoData = ref({});
 const videoIsReady = ref(false);
 const videoDanmuIsReady = ref(false);
+const playerIsReady = ref(false);
 const currentVideoSrc = ref("");
 const source = ref([]);
 const { query } = router.currentRoute.value;
@@ -195,13 +209,7 @@ var barragesJson = ref([]);
 // color: parseInt(Math.random() * 16777215)
 // barragesJson = temp.sort((a, b) => { return a.time - b.time })
 //生成一到100的小数并输出
-onMounted(() => {
-  getVideoById(query.videoId).then((res) => {
-  videoData.value = res.data;
-  source.value = res.data.source_list;
-  currentVideoSrc.value = source.value[1].source_url;
-  videoIsReady.value = true;
-});
+function getDanmuList () {
   getDanmuListByVideoId({ 'video_id': query.videoId }).then((res) => {
     barragesJson.value = res.data.map((item) => {
       return {
@@ -216,6 +224,15 @@ onMounted(() => {
     videoDanmuIsReady.value = true;
     // barragesJson.value = res.data;
   });
+}
+onMounted(() => {
+  getVideoById(query.videoId).then((res) => {
+    videoData.value = res.data;
+    source.value = res.data.source_list;
+    currentVideoSrc.value = source.value[1].source_url;
+    videoIsReady.value = true;
+  });
+  getDanmuList();
   //获取路由参数
   window.addEventListener("fullscreenchange", () => {
     fullscreenchanged();
@@ -255,6 +272,8 @@ function viewCore (id, player) {
   setbtn_full(player);
   setbtn_setting(player);
   setbtn_pip(player);
+  playerIsReady.value = true;
+  playerOnDanmu.value = player;
 }
 function setbtn_volume (player) {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -445,8 +464,9 @@ function setbtn_pip (player) {
 }
 
 .video-player__left-top {
-  flex: 1.2;
+  height: 60%;
   background-color: transparent;
+  flex-shrink: 0;
   /* Add styles for the video player container */
 }
 
@@ -662,7 +682,7 @@ function setbtn_pip (player) {
   flex: 0.8;
 
   .video-player-content {
-    height: 22vh;
+    height: 25vh;
     width: 100%;
 
     .video-player-content-top {
@@ -670,7 +690,6 @@ function setbtn_pip (player) {
       width: 100%;
 
       .video-player-title {
-        margin-top: 20px;
         font-size: larger;
         color: var(--color-white);
         text-align: left;
@@ -697,6 +716,7 @@ function setbtn_pip (player) {
 
       .video-player-content-bottom-description {
         color: var(--description-color);
+        font-size: 13px;
         text-align: start;
         overflow: hidden;
         -webkit-line-clamp: 4;
@@ -743,7 +763,7 @@ function setbtn_pip (player) {
   }
 }
 
-.btn_like {
+.btn_favorite {
   width: -moz-fit-content;
   padding-left: 20px;
   padding-right: 20px;
