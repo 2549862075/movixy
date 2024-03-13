@@ -19,3 +19,10 @@ export function deleteFavorite(data) {
 		params: data
 	})
 }
+export function getFavoriteByVideoIdAndUserId(params) {
+	return request({
+		url: '/favorite/getFavoriteByVideoIdAndUserId',
+		method: 'get',
+		params
+	})
+}

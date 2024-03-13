@@ -5,12 +5,12 @@
         <div class="player-container">
           <div class="video1" v-if="whichCore && videoIsReady && videoDanmuIsReady">
             <vue3-video-player :title="videoData.video_name" @play="videoPlay" :autoplay="true"
-              :view-core="viewCore.bind(null, 'video')" :src="currentVideoSrc"
+              :view-core="viewCore.bind(null, 'video')" :src="currentVideoSrc" :cover="cover"
               :barrageConfig="{ fontSize: 20, opacity: 90, position: 70, barrageList: barragesJson }">
             </vue3-video-player>
           </div>
           <div class="video2" v-if="!whichCore && videoIsReady && videoDanmuIsReady">
-            <vue3-video-player class="video2-player" :core="HLSCore" @play="videoPlay" :autoplay="true"
+            <vue3-video-player class="video2-player" :core="HLSCore" @play="videoPlay" :autoplay="true" :cover="cover"
               :view-core="viewCore.bind(null, 'video')" :src="currentVideoSrc"
               :barrageConfig="{ fontSize: 20, opacity: 90, position: 70, barrageList: barragesJson }">
             </vue3-video-player>
@@ -18,7 +18,7 @@
         </div>
       </div>
       <div class="video-player__left-bottom">
-        <div style="display: flex;flex-direction: row;justify-content: flex-end;width: 90%;margin-top: 20px;">
+        <div style="display: flex;flex-direction: row;justify-content: flex-end;width: 95%;margin-top: 20px;">
           <Danmu v-if="playerIsReady" @updateDanmu="getDanmuList" style="height: 43px;" :video_id="videoData.video_id"
             :videoplayer="playerOnDanmu"></Danmu>
         </div>
@@ -31,8 +31,8 @@
             <el-col :span="12">
               <el-row align="middle" :gutter="20" style="height: 100%">
                 <el-col style="" :span="8">
-                  <el-popover placement="top" :width="200" :show-arrow="false" transition="el-zoom-in-top"
-                    trigger="click" popper-style="background-color:rgba(0, 0, 0, 0.4);border:none;fliter:blur(1px);">
+                  <el-popover placement="top" :width="300" :show-arrow="false" transition="el-zoom-in-top"
+                    trigger="click" popper-style="background-color:rgba(0, 0, 0, 0.7);border:none;fliter:blur(1px);">
                     <template #reference>
                       <div class="btn_selections">
                         <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -67,7 +67,14 @@
                         <span>&nbsp; Selections</span>
                       </div>
                     </template>
-                    
+                    <div
+                      style="max-height: 250px;width: 100%;display: flex;flex-direction: row;flex-wrap: wrap;justify-content:flex-start;overflow: auto;">
+                      <div
+                        :class="currentVideoSrc === item.source_url ? 'btn_selections_item_active' : 'btn_selections_item'"
+                        v-for="item in source" @click="currentVideoSrc = item.source_url">
+                        {{ item.source_name }}
+                      </div>
+                    </div>
                   </el-popover>
                 </el-col>
                 <el-col style="" :span="8">
@@ -122,20 +129,20 @@
             Directors and actors
           </div>
           <div class="video-player-people-list">
-            <div class="video-player-people-list-item" v-for="i in 8">
+            <div class="video-player-people-list-item">
               <el-row style="height: 100%">
-                <el-col :span="8">
-                  <div style="
+                <el-col :span="8" style="display: flex;">
+                  <img v-image-is-exist="directorData.avatar" style="
                       width: 100%;
                       height: 100%;
-                      background-color: var(--movixy-seven-color);
                       border-radius: 50%;
-                    "></div>
+                    "></img>
                 </el-col>
                 <el-col :span="16" style="display: flex; flex-direction: column">
                   <div style="
                       text-align: start;
                       color: var(--color-white);
+                      line-height: 25px;
                       font-size: small;
                       font-weight: bold;
                       flex: 1.5;
@@ -143,7 +150,7 @@
                       width: 80%;
                       margin-left: 15%;
                     ">
-                    Nrererererame
+                    {{ directorData.director_name }}
                   </div>
                   <div style="
                       text-align: start;
@@ -154,10 +161,72 @@
                       width: 80%;
                       margin-left: 15%;
                     ">
-                    Role
+                    Director
                   </div>
                 </el-col>
               </el-row>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex;height: auto;width: 100%;display: flex;flex-direction: column;">
+          <div
+            style="width: 100%;height: auto;display: flex;justify-content: flex-start;margin-bottom: 10px;align-items: center;padding-top: 5px;padding-bottom: 5px;">
+
+            <span style="color: var(--color-white);font-size: x-large;font-weight: bold;">评论</span>
+            <span style="font-size: medium;margin-left: 30px;color: var(--color-white);">最热</span><span
+              style="font-size: medium;margin-left: 10px;color: var(--color-white);">最新</span>
+            <el-input v-model="comment.comment_content" style="width: 300px;margin-left: 30px;" autosize type="textarea"
+              placeholder="请输入评论内容。。。" />
+            <el-popover v-model:visible="el_popper" placement="top" width="300" :show-arrow="false" trigger="click"
+              popper-style="background-color:rgba(255,255,255,0.2);border:none;fliter:blur(1px);">
+
+              <template #reference>
+                <el-button type="primary"
+                  style="margin-left: 10px;border-color: transparent; background-color: var(--movixy-primary-color);">评论</el-button>
+              </template>
+              <div style="display: flex;flex-direction: column;">
+                <span style="font-size: 13px;color: var(--color-white);">请先评分</span>
+                <el-rate class="el-rate-m" :max="10" text-color="var(--movixy-primary-color)"
+                  v-model="comment.comment_rating" allow-half
+                  :texts="['1分', '2分', '3分', '4分', '5分', '6分', '7分', '8分', '9分', '10分']" show-text></el-rate>
+                <el-row>
+                  <el-col :offset="18" :span="4"><el-button
+                      style=" background-color: var(--movixy-primary-color);border-color: transparent;" type="primary"
+                      @click="handleComment">确定</el-button></el-col>
+                </el-row>
+              </div>
+            </el-popover>
+          </div>
+          <div v-for="item in commentList"
+            style="height: auto;width: 100%;margin-bottom: 10px;margin-top: 10px;padding-bottom: 10px; margin-right: 50px;border-bottom: 1px solid var(--movixy-six-color); display: flex;flex-direction: row;justify-content: flex-start;align-items: flex-start ; ">
+            <img v-image-is-exist="item.user.avatar"
+              style="width: 50px;height: 50px;border-radius: 50%;margin-left: 20px;"></img>
+            <div
+              style="display: flex; margin-left: 20px;color: var(--color-white);font-size: small;font-weight: bold;width: 80px;overflow: hidden;">
+              {{
+            item.user.user_name
+          }}
+            </div>
+            <el-text v-html="item.comment_content"
+              style="display: flex;flex-direction: row; margin-left: 30px;width: 70%;text-align: left;padding: 5px;color: var(--color-white);border: 1px solid var(--movixy-six-color); border-radius: 5px;"
+              line-clamp="0">
+            </el-text>
+            <div
+              style="margin-left:10px;width: 30%;height:60px; margin-top: auto;display: flex;flex-direction: column;align-items: flex-start;justify-content: flex-end;">
+              <div style="display: flex;align-items: center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M8.39014 18.49V8.32998C8.39014 7.92998 8.51014 7.53998 8.73014 7.20998L11.4601 3.14998C11.8901 2.49998 12.9601 2.03998 13.8701 2.37998C14.8501 2.70998 15.5001 3.80997 15.2901 4.78997L14.7701 8.05998C14.7301 8.35998 14.8101 8.62998 14.9801 8.83998C15.1501 9.02998 15.4001 9.14997 15.6701 9.14997H19.7801C20.5701 9.14997 21.2501 9.46997 21.6501 10.03C22.0301 10.57 22.1001 11.27 21.8501 11.98L19.3901 19.47C19.0801 20.71 17.7301 21.72 16.3901 21.72H12.4901C11.8201 21.72 10.8801 21.49 10.4501 21.06L9.17014 20.07C8.68014 19.7 8.39014 19.11 8.39014 18.49Z"
+                    fill="var(--color-white)" />
+                  <path
+                    d="M5.21 6.38H4.18C2.63 6.38 2 6.98 2 8.46V18.52C2 20 2.63 20.6 4.18 20.6H5.21C6.76 20.6 7.39 20 7.39 18.52V8.46C7.39 6.98 6.76 6.38 5.21 6.38Z"
+                    fill="var(--color-white)" />
+                </svg>
+                <span style="color: var(--color-white);margin-left: 10px;">{{ item.comment_like == null ? 0 :
+            item.comment_like
+                  }}</span>
+              </div>
+              <div style="color: var(--color-white);margin-top: 10px;">{{ item.comment_time }}</div>
             </div>
           </div>
         </div>
@@ -182,25 +251,44 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, onUnmounted, computed } from "vue";
+import cover from "../../assets/b.jpg";
 import { getVideoById } from "#/api/videoApi";
 import { getDanmuListByVideoId } from "#/api/danmuApi";
+import { getDirectorById } from "#/api/actorAndDirectorApi";
+import { getCommentByVideoId, addComment } from "#/api/commentApi";
+import { getFavoriteByVideoIdAndUserId, deleteFavorite, addVideoToFavorite } from "#/api/favoriteApi";
 import WideCard from "#/components/WideCard/index.vue";
 import Danmu from "#/components/Danmu/index.vue";
 import HLSCore from "@cloudgeek/playcore-hls";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 const whichCore = ref(false); //false表示video2，也就是支持HLS的核心。true也就是video1
-const players = ref({});
-const playerOnDanmu = ref('');
-const router = useRouter();
-const videoData = ref({});
-const videoIsReady = ref(false);
-const videoDanmuIsReady = ref(false);
-const playerIsReady = ref(false);
-const currentVideoSrc = ref("");
-const source = ref([]);
-const { query } = router.currentRoute.value;
-var barragesJson = ref([]);
+const players = ref({});//播放器
+const playerOnDanmu = ref('');//弹幕播放器
+const router = useRouter();//路由
+const store = useStore();//vuex
+const videoData = ref({});//视频数据
+const videoIsReady = ref(false);//视频是否准备好
+const videoDanmuIsReady = ref(false);//视频弹幕是否准备好
+const playerIsReady = ref(false);//播放器是否准备好
+const currentVideoSrc = ref("");//当前视频源
+const directorData = ref({});//导演数据
+var commentList = ref([]);//评论列表
+var el_popper = ref(false);//评论弹窗
+const source = ref([]);//视频源
+const isFavorite = ref(false);//是否收藏
+const favoriteId = ref('');//收藏id
+const { query } = router.currentRoute.value;//路由参数 query.videoId表示视频id
+var barragesJson = ref([]);//弹幕列表
+const user_id = computed(() => store.getters.user_id);//用户id
+var comment = ref({
+  user_id: user_id.value,
+  video_id: query.videoId,
+  comment_content: '',
+  comment_time: new Date().toLocaleString(),
+  comment_rating: 0
+})//
 // type: 1,
 // content: "<p><strong>demo1</strong></p>",
 // avatar: 'https://api.multiavatar.com/LarchLiu.png',
@@ -208,7 +296,7 @@ var barragesJson = ref([]);
 // time: parseFloat(time / 1000)
 // color: parseInt(Math.random() * 16777215)
 // barragesJson = temp.sort((a, b) => { return a.time - b.time })
-//生成一到100的小数并输出
+
 function getDanmuList () {
   getDanmuListByVideoId({ 'video_id': query.videoId }).then((res) => {
     barragesJson.value = res.data.map((item) => {
@@ -222,18 +310,138 @@ function getDanmuList () {
       };
     });
     videoDanmuIsReady.value = true;
-    // barragesJson.value = res.data;
   });
 }
+//评论
+function handleComment () {
+  el_popper.value = false;
+  if (comment.value.comment_rating == '') {
+    ElMessage.error('请先评分');
+    return;
+  }
+  if (comment.value.comment_content == '') {
+    ElMessage.error('评论内容不能为空');
+    return;
+  }
+  if (comment.value.comment_content.length > 200) {
+    ElMessage.error('评论内容不能超过200字');
+    return;
+  }
+  if (user_id.value == null || user_id.value == '' || user_id.value == undefined) {
+    ElMessage.error('请先登录');
+    return;
+  }
+  //添加评论
+  addComment(comment.value).then((res) => {
+    if (res.code == 200) {
+      ElMessage.success('评论成功');
+      comment.value.comment_content = '';
+      comment.value.comment_rating = '';
+      getCommentByVideoId({ 'video_id': query.videoId }).then((res) => {
+        commentList.value = res.data;
+      });
+    } else {
+      ElMessage.error('评论失败');
+    }
+  });
+}
+//计算favorite样式
+const favoriteStyle = computed(() => isFavorite.value ? '#eb3f5e' : 'var(--movixy-seven-color)')
+
+//点击收藏按钮
+function handlebtnFavorite () {
+  if (user_id.value == null || user_id.value == '' || user_id.value == undefined) {
+    ElMessage.error('请先登录');
+    return;
+  }
+  if (isFavorite.value) {
+    //取消收藏
+    deleteFavorite({ 'favorite_id': favoriteId.value }).then((res) => {
+      if (res.code == 200) {
+        ElMessage.success('取消收藏成功');
+        isFavorite.value = false;
+      } else {
+        ElMessage.error('取消收藏失败');
+      }
+    });
+  } else {
+    //收藏
+    addVideoToFavorite({ 'videoId': query.videoId, 'userId': user_id.value }).then((res) => {
+      if (res.code == 200) {
+        ElMessage.success('收藏成功');
+        isFavorite.value = true;
+        getFavoriteByVideoIdAndUserId({ 'video_id': query.videoId, 'user_id': user_id.value }).then((res) => {
+          if (res.data !== null && res.data !== undefined && res.data !== "") {
+            favoriteId.value = res.data.favorite_id;
+          } else {
+            ElMessage.error('出现错误');
+            favoriteId.value = '';//收藏id
+          }
+        });
+      } else {
+        ElMessage.error('收藏失败');
+      }
+    });
+  }
+
+}
+
+// {
+//     "video_id": 1,
+//     "video_name": "熊出没·伴我“熊芯” ",
+//     "video_img": "https://img1.baidu.com/it/u=2428866856,2924840891&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1709312400&t=94f42a22e3d9e61c9ac94f81df500c65",
+//     "actor_id": 1,
+//     "director_id": 1,
+//     "summary": "一个普通的森林夜晚，对小熊大、小熊二宠爱有加的熊妈妈，在一场大火后离开了他们，两熊伤心不已……转眼多年过去，光头强带熊大熊二前往振兴岛参观机器人研究所，却意外得到了熊妈妈的线索，为此熊大、熊二一路探寻……熊妈当年为何不告而别？两熊最终是否能找到妈妈？迷雾重重的背后还有怎样的故事？一切谜团等待揭晓。",
+//     "rating": null,
+//     "category": "[movies,animation]",
+//     "video_label": "[喜剧/科幻/冒险/可爱]",
+//     "time": null,
+//     "video_url": null,
+//     "remark": null,
+//     "view_number": null,
+//     "source_list": [
+//         {
+//             "source_id": 1,
+//             "source_name": "中文版",
+//             "source_url": "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
+//             "video_id": null,
+//             "remark": null
+//         },
+//         {
+//             "source_id": 2,
+//             "source_name": "英文版",
+//             "source_url": "https://static.smartisanos.cn/common/video/production/delta/r2.mp4",
+//             "video_id": null,
+//             "remark": null
+//         }
+//     ]
+// }
 onMounted(() => {
+  //获取当前视频的信息
   getVideoById(query.videoId).then((res) => {
     videoData.value = res.data;
     source.value = res.data.source_list;
-    currentVideoSrc.value = source.value[1].source_url;
+    currentVideoSrc.value = source.value[0].source_url;
     videoIsReady.value = true;
+    getDirectorById({ 'director_id': videoData.value.director_id }).then((res) => {
+      directorData.value = res.data;
+    });
   });
+  //获取当前视频的评论
+  getCommentByVideoId({ 'video_id': query.videoId }).then((res) => {
+    commentList.value = res.data;
+  });
+  //获取当前视频的弹幕
   getDanmuList();
-  //获取路由参数
+  //获取当前用户是否收藏了当前视频
+  getFavoriteByVideoIdAndUserId({ 'video_id': query.videoId, 'user_id': user_id.value }).then((res) => {
+    if (res.data !== null && res.data !== undefined && res.data !== "") {
+      favoriteId.value = res.data.favorite_id;
+      isFavorite.value = true;
+    }
+  });
+
   window.addEventListener("fullscreenchange", () => {
     fullscreenchanged();
   });
@@ -247,14 +455,23 @@ onMounted(() => {
     fullscreenchanged();
   });
 });
-
-watch(currentVideoSrc, (newVal) => {
-  //如果video以MP4结尾则whichCore是true，其他则为false
-  if (newVal.endsWith("mp4")) {
-    whichCore.value = true;
-  } else {
-    whichCore.value = false;
-  }
+onUnmounted(() => {
+  window.removeEventListener("fullscreenchange", fullscreenchanged);
+  window.removeEventListener("mozfullscreenchange", fullscreenchanged);
+  window.removeEventListener("webkitfullscreenchange", fullscreenchanged);
+  window.removeEventListener("msfullscreenchange", fullscreenchanged);
+  players["video"].destroy();//销毁video
+}),
+  watch(currentVideoSrc, (newVal) => {
+    //如果video以MP4结尾则whichCore是true，其他则为false
+    if (newVal.endsWith("mp4")) {
+      whichCore.value = true;
+    } else {
+      whichCore.value = false;
+    }
+  });
+watch(user_id, (newVal) => {
+  comment.value.user_id = newVal;
 });
 function videoPlay () {
   console.log("Video played");
@@ -464,7 +681,7 @@ function setbtn_pip (player) {
 }
 
 .video-player__left-top {
-  height: 60%;
+  height: 55vh;
   background-color: transparent;
   flex-shrink: 0;
   /* Add styles for the video player container */
@@ -730,6 +947,7 @@ function setbtn_pip (player) {
 }
 
 .btn_selections {
+  cursor: pointer;
   width: -moz-fit-content;
   padding-left: 10px;
   padding-right: 10px;
@@ -744,7 +962,34 @@ function setbtn_pip (player) {
   color: var(--color-white);
 }
 
+.btn_selections_item {
+  cursor: pointer;
+  color: white;
+  margin: 5px;
+  background-color: var(--movixy-seven-color);
+  width: 80px;
+  height: 40px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn_selections_item_active {
+  cursor: pointer;
+  color: white;
+  margin: 5px;
+  background-color: var(--movixy-primary-color);
+  width: 80px;
+  height: 40px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .btn_download {
+  cursor: pointer;
   width: -moz-fit-content;
   padding-left: 10px;
   padding-right: 10px;
@@ -765,11 +1010,12 @@ function setbtn_pip (player) {
 
 .btn_favorite {
   width: -moz-fit-content;
+  cursor: pointer;
   padding-left: 20px;
   padding-right: 20px;
   border-radius: 8px;
   height: 5vh;
-  background-color: #eb3f5e;
+  background-color: v-bind(favoriteStyle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -777,6 +1023,7 @@ function setbtn_pip (player) {
 }
 
 .video-player-people-list {
+  padding-bottom: 20px;
   width: 60vw;
   height: 60px;
   display: flex;
@@ -792,6 +1039,7 @@ function setbtn_pip (player) {
   height: 50px;
   margin-top: 10px;
   margin-right: 15px;
+  display: flex;
   // border-style: solid;
   // border-width: 1px;
   // border-radius: 5px;
@@ -819,4 +1067,9 @@ function setbtn_pip (player) {
 //   width: 30px;
 //   height: 30px;
 //   background-color: red;
-// }</style>
+// }
+.el-rate-m {
+  --color: var(--color-white);
+  --el-rate-fill-color: var(--movixy-primary-color)
+}
+</style>

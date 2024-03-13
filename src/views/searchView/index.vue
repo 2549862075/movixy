@@ -58,6 +58,7 @@ onMounted(() => {
 })
 onUnmounted(() => {
 	store.dispatch('animate/setAnimate', 'zoom')
+	window.onscroll = null
 })
 
 function load() {

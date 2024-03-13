@@ -7,7 +7,7 @@
 </template>
 
 <script setup>
-import {ref,onMounted,watch} from 'vue'
+import {ref,onMounted,watch,onUnmounted} from 'vue'
 import {getVideoByUsersPreference,getVideoByDataAndViewsNumber} from '#/api/videoApi'
 import {useStore} from 'vuex'
 import { ElMessage } from 'element-plus';
@@ -48,7 +48,9 @@ if(scrollTop+windowHeight+1>=scrollHeight){
 	}
 }
 }})	
-
+onUnmounted(() => {
+	window.onscroll = null
+})
 async function  load () {
 	if(store.getters.user_id){
 		//登录了用户
