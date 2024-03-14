@@ -214,13 +214,11 @@
             <div
               style="margin-left:10px;width: 30%;height:60px; margin-top: auto;display: flex;flex-direction: column;align-items: flex-start;justify-content: flex-end;">
               <div style="display: flex;align-items: center;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M8.39014 18.49V8.32998C8.39014 7.92998 8.51014 7.53998 8.73014 7.20998L11.4601 3.14998C11.8901 2.49998 12.9601 2.03998 13.8701 2.37998C14.8501 2.70998 15.5001 3.80997 15.2901 4.78997L14.7701 8.05998C14.7301 8.35998 14.8101 8.62998 14.9801 8.83998C15.1501 9.02998 15.4001 9.14997 15.6701 9.14997H19.7801C20.5701 9.14997 21.2501 9.46997 21.6501 10.03C22.0301 10.57 22.1001 11.27 21.8501 11.98L19.3901 19.47C19.0801 20.71 17.7301 21.72 16.3901 21.72H12.4901C11.8201 21.72 10.8801 21.49 10.4501 21.06L9.17014 20.07C8.68014 19.7 8.39014 19.11 8.39014 18.49Z"
-                    fill="var(--color-white)" />
-                  <path
-                    d="M5.21 6.38H4.18C2.63 6.38 2 6.98 2 8.46V18.52C2 20 2.63 20.6 4.18 20.6H5.21C6.76 20.6 7.39 20 7.39 18.52V8.46C7.39 6.98 6.76 6.38 5.21 6.38Z"
-                    fill="var(--color-white)" />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" @click="handleCommentLike(item.comment_id)">
+                  <path class="comment-like-svg-path" :fill="commentIsLike(item.comment_id)"
+                    d="M8.39014 18.49V8.32998C8.39014 7.92998 8.51014 7.53998 8.73014 7.20998L11.4601 3.14998C11.8901 2.49998 12.9601 2.03998 13.8701 2.37998C14.8501 2.70998 15.5001 3.80997 15.2901 4.78997L14.7701 8.05998C14.7301 8.35998 14.8101 8.62998 14.9801 8.83998C15.1501 9.02998 15.4001 9.14997 15.6701 9.14997H19.7801C20.5701 9.14997 21.2501 9.46997 21.6501 10.03C22.0301 10.57 22.1001 11.27 21.8501 11.98L19.3901 19.47C19.0801 20.71 17.7301 21.72 16.3901 21.72H12.4901C11.8201 21.72 10.8801 21.49 10.4501 21.06L9.17014 20.07C8.68014 19.7 8.39014 19.11 8.39014 18.49Z" />
+                  <path class="comment-like-svg-path" :fill="commentIsLike(item.comment_id)"
+                    d="M5.21 6.38H4.18C2.63 6.38 2 6.98 2 8.46V18.52C2 20 2.63 20.6 4.18 20.6H5.21C6.76 20.6 7.39 20 7.39 18.52V8.46C7.39 6.98 6.76 6.38 5.21 6.38Z" />
                 </svg>
                 <span style="color: var(--color-white);margin-left: 10px;">{{ item.comment_like == null ? 0 :
             item.comment_like
@@ -258,6 +256,7 @@ import { getDanmuListByVideoId } from "#/api/danmuApi";
 import { getDirectorById } from "#/api/actorAndDirectorApi";
 import { getCommentByVideoId, addComment } from "#/api/commentApi";
 import { getFavoriteByVideoIdAndUserId, deleteFavorite, addVideoToFavorite } from "#/api/favoriteApi";
+import { getCommentLikeByUserId ,addCommentLike,deleteCommentLike} from "#/api/commentLikeApi";
 import WideCard from "#/components/WideCard/index.vue";
 import Danmu from "#/components/Danmu/index.vue";
 import HLSCore from "@cloudgeek/playcore-hls";
@@ -289,6 +288,7 @@ var comment = ref({
   comment_time: new Date().toLocaleString(),
   comment_rating: 0
 })//
+var commentLikeList = ref([]);//评论点赞列表
 // type: 1,
 // content: "<p><strong>demo1</strong></p>",
 // avatar: 'https://api.multiavatar.com/LarchLiu.png',
@@ -345,9 +345,61 @@ function handleComment () {
     }
   });
 }
+//用户点击评论点赞
+function handleCommentLike (comment_id) {
+  if (user_id.value == null || user_id.value == '' || user_id.value == undefined) {
+    ElMessage.error('请先登录');
+    return;
+  }
+  if(commentLikeList.value.length>0){
+    for (let i = 0; i < commentLikeList.value.length; i++) {
+      if (commentLikeList.value[i].comment_id == comment_id) {
+        //取消点赞
+        deleteCommentLike({ 'comment_like_id': commentLikeList.value[i].comment_like_id,'comment_id':comment_id}).then((res) => {
+          if (res.code == 200) {
+            ElMessage.success('取消点赞成功');
+            getCommentLikeByUserId({ 'user_id': user_id.value }).then((res) => {
+              commentLikeList.value = res.data;
+            });
+            getCommentByVideoId({ 'video_id': query.videoId }).then((res) => {
+              commentList.value = res.data;
+            });
+          } else {
+            ElMessage.error('取消点赞失败');
+          }
+        });
+        return;
+      }
+    }
+  }
+  //添加评论点赞
+  addCommentLike({ 'comment_id': comment_id, 'user_id': user_id.value }).then((res) => {
+    if (res.code == 200) {
+      ElMessage.success('点赞成功');
+      getCommentLikeByUserId({ 'user_id': user_id.value }).then((res) => {
+        commentLikeList.value = res.data;
+      });
+      getCommentByVideoId({ 'video_id': query.videoId }).then((res) => {
+        commentList.value = res.data;
+      });
+    } else {
+      ElMessage.error('点赞失败');
+    }
+  });
+}
 //计算favorite样式
 const favoriteStyle = computed(() => isFavorite.value ? '#eb3f5e' : 'var(--movixy-seven-color)')
-
+//计算comment是否被当前用户点赞
+function commentIsLike (comment_id) {
+  if (commentLikeList.value.length > 0) {
+    for (let i = 0; i < commentLikeList.value.length; i++) {
+      if (commentLikeList.value[i].comment_id == comment_id) {
+        return '#eb3f5e';
+      }
+    }
+  }
+  return 'var(--color-white)';
+}
 //点击收藏按钮
 function handlebtnFavorite () {
   if (user_id.value == null || user_id.value == '' || user_id.value == undefined) {
@@ -434,13 +486,19 @@ onMounted(() => {
   });
   //获取当前视频的弹幕
   getDanmuList();
-  //获取当前用户是否收藏了当前视频
-  getFavoriteByVideoIdAndUserId({ 'video_id': query.videoId, 'user_id': user_id.value }).then((res) => {
-    if (res.data !== null && res.data !== undefined && res.data !== "") {
-      favoriteId.value = res.data.favorite_id;
-      isFavorite.value = true;
-    }
-  });
+  if (user_id.value != null && user_id.value != '' && user_id.value != undefined) {
+    //获取当前用户是否收藏了当前视频
+    getFavoriteByVideoIdAndUserId({ 'video_id': query.videoId, 'user_id': user_id.value }).then((res) => {
+      if (res.data !== null && res.data !== undefined && res.data !== "") {
+        favoriteId.value = res.data.favorite_id;
+        isFavorite.value = true;
+      }
+    });
+    //获取当前用户的评论点赞列表
+    getCommentLikeByUserId({ 'user_id': user_id.value }).then((res) => {
+      commentLikeList.value = res.data;
+    });
+  }
 
   window.addEventListener("fullscreenchange", () => {
     fullscreenchanged();
@@ -1072,4 +1130,5 @@ function setbtn_pip (player) {
   --color: var(--color-white);
   --el-rate-fill-color: var(--movixy-primary-color)
 }
+
 </style>

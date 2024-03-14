@@ -7,13 +7,13 @@
           <div class="menu-item-icon">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" width="24px" viewBox="0 0 24 24" fill="none">
               <path class="svg-path"
-                :class="{ 'menu-item-icon-on': activeMenu === item.routerPath || (item.label === 'Setting' && settingDrawer) || (item.label === 'Recent Played' && store.getters.RecentPlayedDrawer)|| (item.label === 'Favorites' && store.getters.FavoriteDrawer) }"
+                :class="{ 'menu-item-icon-on': activeMenu === item.routerPath || (item.label === 'Setting' && settingDrawer) || (item.label === 'Recent Played' && store.getters.RecentPlayedDrawer) || (item.label === 'Favorites' && store.getters.FavoriteDrawer) || (item.label === 'Download' && store.getters.DownloadDrawer) }"
                 v-for="path_item in item.path" :d="path_item"></path>
             </svg>
           </div>
           <span class="menu-item-name"
-            :class="{ 'menu-item-name-on': activeMenu === item.routerPath || (item.label === 'Setting' && settingDrawer) || (item.label === 'Recent Played' && store.getters.RecentPlayedDrawer) || (item.label==='Favorites' &&store.getters.FavoriteDrawer)}">{{
-      item.label }}</span>
+            :class="{ 'menu-item-name-on': activeMenu === item.routerPath || (item.label === 'Setting' && settingDrawer) || (item.label === 'Recent Played' && store.getters.RecentPlayedDrawer) || (item.label === 'Favorites' && store.getters.FavoriteDrawer) || (item.label === 'Download' && store.getters.DownloadDrawer) }">
+            {{ item.label }}</span>
           <ArrowDownBold class="menu-item-dropdown" v-show="item.subItems.length > 0"
             :class="{ expanded: item.expanded }" />
           <div @click.stop="void (0)">
@@ -72,7 +72,7 @@ function handleItemClick (item) {
           store.dispatch("menu/setRecentPlayedDrawer", true)
         }
       } break;
-    case "Favorites":{
+    case "Favorites": {
       if (store.getters.FavoriteDrawer) {
         store.dispatch("menu/setFavoriteDrawer", false)
       }
@@ -80,7 +80,16 @@ function handleItemClick (item) {
         store.dispatch("menu/setAllDrawer", false)
         store.dispatch("menu/setFavoriteDrawer", true)
       }
-    }break;
+    } break;
+    case "Download": {
+      if (store.getters.DownloadDrawer) {
+        store.dispatch("menu/setDownloadDrawer", false)
+      }
+      else {
+        store.dispatch("menu/setAllDrawer", false)
+        store.dispatch("menu/setDownloadDrawer", true)
+      }
+    } break;
     default:
       router.push(item.routerPath);
   }

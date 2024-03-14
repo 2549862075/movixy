@@ -7,6 +7,7 @@ const getters = {
 	settingDrawer:(state)=>state.menu.settingDrawer,
 	RecentPlayedDrawer:(state)=>state.menu.RecentPlayedDrawer,
 	FavoriteDrawer:(state)=>state.menu.FavoriteDrawer,
+	DownloadDrawer:(state)=>state.menu.DownloadDrawer,
 	token: state => state.user.token,
 	user_id: state => state.user.userId,
 	name: state => state.user.name,

@@ -7,6 +7,7 @@ import router from './router'
 import directive from './directive' // directive
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'//右键菜单
 import ContextMenu from '@imengyu/vue3-context-menu'
+import { download } from '#/utils/request'
 
 
 //视频播放器
@@ -55,6 +56,7 @@ app.use(Vue3VideoPlayer, {
   lang: myLang
 })
 app.use(store)
+app.config.globalProperties.$download = download
 app.use(router)
 app.use(directive) 
 app.use(ContextMenu)

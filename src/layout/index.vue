@@ -29,7 +29,9 @@
   <template v-click-outside="handleOut">
     <RecentPlayed v-if="store.getters.RecentPlayedDrawer" />
   </template>
-
+  <template v-click-outside="handleOut">
+    <Download v-if="store.getters.DownloadDrawer" />
+  </template>
   <template v-click-outside="handleOut">
     <Favorite v-if="store.getters.FavoriteDrawer" />
   </template>
@@ -215,6 +217,7 @@ import sideBar from "./components/SideBar/index";
 import AppMain from "./components/RightSection/AppMain.vue";
 import RecentPlayed from "#/views/other/RecentPlayed/index";
 import Favorite from "#/views/other/Favorite/index";
+import Download from "#/views/other/Download/index";
 import { useStore } from "vuex";
 import { ref, computed, watch, reactive } from "vue";
 import { updateUser, updatePassword } from "#/api/user";

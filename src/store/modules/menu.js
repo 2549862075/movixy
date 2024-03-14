@@ -11,6 +11,7 @@ const menu = {
     settingDrawer: false,
     RecentPlayedDrawer: false,
     FavoriteDrawer: false,
+    DownloadDrawer: false,
   },
 
   mutations: {
@@ -35,10 +36,14 @@ const menu = {
     setFavoriteDrawer: (state, FavoriteDrawer) => {
       state.FavoriteDrawer = FavoriteDrawer;
     },
+    setDownloadDrawer: (state, DownloadDrawer) => {
+      state.DownloadDrawer = DownloadDrawer;
+    },
     setAllDrawer: (state, allDrawer) => {
       state.settingDrawer = allDrawer;
       state.RecentPlayedDrawer = allDrawer;
       state.FavoriteDrawer = allDrawer;
+      state.DownloadDrawer = allDrawer;
     },
   },
 
@@ -82,6 +87,18 @@ const menu = {
     setRecentPlayedDrawer: ({ commit }, RecentPlayedDrawer) => {
       if (store.getters.user_id) {
         commit("setRecentPlayedDrawer", RecentPlayedDrawer);
+      } else {
+        ElMessage({
+          showClose: true,
+          message: "Please login first",
+          type: "error",
+          duration: 5000,
+        });
+      }
+    },
+    setDownloadDrawer: ({ commit }, DownloadDrawer) => {
+      if (store.getters.user_id) {
+        commit("setDownloadDrawer", DownloadDrawer);
       } else {
         ElMessage({
           showClose: true,

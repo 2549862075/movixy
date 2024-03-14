@@ -124,18 +124,22 @@ button:active {
   margin-top: 10vh;
   width: 85vw;
 }
-
-.setting-drawer .el-drawer__header,.setting-drawer2 .el-drawer__header ,.recentPlay-drawer .el-drawer__header{
+.download-drawer{
+  margin-left: 15vw;
+  margin-top: 10vh;
+  width: 35vw;
+}
+.setting-drawer .el-drawer__header,.setting-drawer2 .el-drawer__header ,.recentPlay-drawer .el-drawer__header,.download-drawer .el-drawer__header{
   margin-bottom: 0;
   padding: 0px;
 }
 
-.setting-drawer .el-drawer__body,.setting-drawer2 .el-drawer__body ,.recentPlay-drawer .el-drawer__body{
+.setting-drawer .el-drawer__body,.setting-drawer2 .el-drawer__body ,.recentPlay-drawer .el-drawer__body,.download-drawer .el-drawer__body{
   display: flex;
   flex-direction: row;
 }
 
-.setting-drawer .el-drawer,.setting-drawer2 .el-drawer,.recentPlay-drawer .el-drawer {
+.setting-drawer .el-drawer,.setting-drawer2 .el-drawer,.recentPlay-drawer .el-drawer,.download-drawer .el-drawer{
   box-shadow: none;
 }
 .v3-menus{
